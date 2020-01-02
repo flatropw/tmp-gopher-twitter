@@ -21,6 +21,8 @@ const (
 	MinPasswordLength = 5
 )
 
+var repo = postgres.UsersRepositoryPostgres{}
+
 type User struct {
 	Id uint `json:"id"`
 	Login string `json:"login"`
@@ -37,8 +39,7 @@ func (user *User) Create() (map[string] interface{}) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.Password = string(hashedPassword)
 
-	usersRepository := postgres.UsersRepositoryPostgres{}
-	res, err := usersRepository.Save(*user)
+	res, err := repo.Save(*user)
 
 	if err != nil {
 		log.Print(err)
@@ -48,13 +49,12 @@ func (user *User) Create() (map[string] interface{}) {
 		return u.Message(false, "Failed to create user, connection error.")
 	}
 
-	//Создать новый токен JWT для новой зарегистрированной учётной записи
 	tk := &Token{Id: res.Id}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
 	user.Token = tokenString
 
-	user.Password = "" //удалить пароль
+	user.Password = ""
 
 	response := u.Message(true, "User has been created")
 	response["user"] = user
@@ -76,13 +76,12 @@ func (user *User) Validate() (map[string] interface{}, bool) {
 		return u.Message(false, "Email field empty or invalid"), false
 	}
 
-	usersRepository := postgres.UsersRepositoryPostgres{}
-	res, err := usersRepository.GetByLogin(user.Login)
+	res, err := repo.GetByLogin(user.Login)
 	if (User{}) != res {
 		return u.Message(false, "User with the same login already exists"), false
 	}
 
-	res, err = usersRepository.GetByEmail(user.Login)
+	res, err = repo.GetByEmail(user.Email)
 	if (User{}) != res {
 		return u.Message(false, "User with the same email already exists"), false
 	}
@@ -90,29 +89,26 @@ func (user *User) Validate() (map[string] interface{}, bool) {
 	return u.Message(true, "*ok*"), true
 }
 
-func Login(email, password string) (map[string]interface{}) {
-
-	user := &User{}
-	err := GetDB().Table("users").Where("email = ?", email).First(user).Error
+func Login(email, password string) map[string]interface{} {
+	user, err := repo.GetByEmail(email)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Email address not found")
-		}
-		return u.Message(false, "Connection error. Please retry")
+		return u.Message(false, "Unknown error")
+	}
+
+	if (User{}) == user {
+		return u.Message(false, "User with this email does not exist")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword { //Пароль не совпадает!!
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return u.Message(false, "Invalid login credentials. Please try again")
 	}
-	//Работает! Войти в систему
+
 	user.Password = ""
 
-	//Создать токен JWT
-	tk := &Token{UserId: user.ID}
+	tk := &Token{Id: user.Id}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
-	user.Token = tokenString // Сохраните токен в ответе
+	user.Token, _ = token.SignedString([]byte(os.Getenv("token_password")))
 
 	resp := u.Message(true, "Logged In")
 	resp["user"] = user

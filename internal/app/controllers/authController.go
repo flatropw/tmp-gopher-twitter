@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-var CreateUser = func(w http.ResponseWriter, r *http.Request) {
+var RegisterUser = func(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 
 	body, err := ioutil.ReadAll(r.Body)

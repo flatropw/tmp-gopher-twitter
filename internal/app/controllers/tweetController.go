@@ -11,8 +11,8 @@ import (
 
 var CreateTweet = func(w http.ResponseWriter, r *http.Request) {
 	tweet := models.Tweet{
-		UserId: r.Context().Value("user") . (uint),
-		CreatedAt: 	time.Now().Unix(),
+		UserId:    r.Context().Value("user").(uint),
+		CreatedAt: time.Now().Unix(),
 	}
 
 	body, err := ioutil.ReadAll(r.Body)

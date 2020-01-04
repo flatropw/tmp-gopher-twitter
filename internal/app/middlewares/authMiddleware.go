@@ -19,7 +19,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			return
 		}
 
-		response := make(map[string] interface{})
+		response := make(map[string]interface{})
 		tokenHeader := r.Header.Get("Authorization") //Получение токена
 
 		if len(tokenHeader) == 0 {

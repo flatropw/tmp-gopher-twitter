@@ -17,5 +17,3 @@ func (*dbInstance) Connect(connString string) (err error) {
 	}
 	return
 }
-
-

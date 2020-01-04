@@ -9,10 +9,10 @@ import (
 )
 
 type Tweet struct {
-	Id uint `json:"id"`
-	Message string `json:"message"`
-	UserId uint `json:"user_id"`
-	CreatedAt int64 `json:"created_at"`
+	Id        uint   `json:"id"`
+	Message   string `json:"message"`
+	UserId    uint   `json:"user_id"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 const (
@@ -20,7 +20,7 @@ const (
 	MaxTweetLength = 280
 )
 
-func (tweet *Tweet) Validate() (map[string] interface{}, bool) {
+func (tweet *Tweet) Validate() (map[string]interface{}, bool) {
 	if len(tweet.Message) < MinTweetLength {
 		return u.Message(false, fmt.Sprintf("Tweet length must be longer then %d characters", MinTweetLength)), false
 	}
@@ -32,7 +32,7 @@ func (tweet *Tweet) Validate() (map[string] interface{}, bool) {
 	return u.Message(true, "*ok*"), true
 }
 
-func (tweet *Tweet) Create() map[string] interface{} {
+func (tweet *Tweet) Create() map[string]interface{} {
 	if resp, ok := tweet.Validate(); !ok {
 		return resp
 	}

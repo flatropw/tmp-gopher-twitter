@@ -23,14 +23,14 @@ const (
 )
 
 type User struct {
-	Id uint `json:"id"`
-	Login string `json:"login"`
-	Email string `json:"email"`
+	Id       uint   `json:"id"`
+	Login    string `json:"login"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
-	Token string `json:"token";sql:"-"`
+	Token    string `json:"token";sql:"-"`
 }
 
-func (user *User) Create() map[string] interface{} {
+func (user *User) Create() map[string]interface{} {
 	if resp, ok := user.Validate(); !ok {
 		return resp
 	}
@@ -42,7 +42,7 @@ func (user *User) Create() map[string] interface{} {
 	if err != nil {
 		log.Print(err)
 	}
-	
+
 	if res.Id <= 0 {
 		return u.Message(false, "Failed to create user, connection error.")
 	}
@@ -63,7 +63,7 @@ func (user *User) Create() map[string] interface{} {
 
 }
 
-func (user *User) Validate() (map[string] interface{}, bool) {
+func (user *User) Validate() (map[string]interface{}, bool) {
 	if len(user.Login) < MinLoginLength {
 		return u.Message(false, fmt.Sprintf("Login length must be longer then %d characters", MinLoginLength)), false
 	}
@@ -117,8 +117,6 @@ func (user *User) Authenticate(email, password string) map[string]interface{} {
 	return resp
 }
 
-
-
 func (user *User) Save() (*User, error) {
 	err := db.Instance.Db.QueryRow(db.InsertQuery, user.Login, user.Email, user.Password, user.Token).Scan(&user.Id)
 	dbErr := dberror.GetError(err)
@@ -165,7 +163,6 @@ func (user *User) GetByID(id uint) (*User, error) {
 	}
 }
 
-
 func (user *User) GetByEmail(email string) (*User, error) {
 	us := &User{}
 	row := db.Instance.Db.QueryRow(db.GetByEmailQuery, email)
@@ -192,9 +189,7 @@ func (user *User) GetByLogin(login string) (*User, error) {
 	}
 }
 
-
 func (user *User) Delete(id uint) error {
 	_, err := db.Instance.Db.Exec(db.DeleteQuery, id)
 	return dberror.GetError(err)
 }
-

@@ -13,7 +13,7 @@ import (
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !u.IsAuthorizedRoute(r.URL.Path) {
+		if u.IsAuthorizedRoute(r.URL.Path) {
 			next.ServeHTTP(w, r)
 			return
 		}

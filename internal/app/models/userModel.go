@@ -2,9 +2,10 @@ package models
 
 import (
 	"fmt"
+	"github.com/Shyp/go-dberror"
 	"github.com/badoux/checkmail"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/flatropw/gopher-twitter/internal/app/repositories/postgres"
+	"github.com/flatropw/gopher-twitter/internal/app/db"
 	u "github.com/flatropw/gopher-twitter/internal/app/utils"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -21,8 +22,6 @@ const (
 	MinPasswordLength = 5
 )
 
-var repo = postgres.UsersRepositoryPostgres{}
-
 type User struct {
 	Id uint `json:"id"`
 	Login string `json:"login"`
@@ -31,7 +30,7 @@ type User struct {
 	Token string `json:"token";sql:"-"`
 }
 
-func (user *User) Create() (map[string] interface{}) {
+func (user *User) Create() map[string] interface{} {
 	if resp, ok := user.Validate(); !ok {
 		return resp
 	}
@@ -39,8 +38,8 @@ func (user *User) Create() (map[string] interface{}) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.Password = string(hashedPassword)
 
-	res, err := repo.Save(*user)
-
+	res, err := user.Save()
+	fmt.Println("res", res)
 	if err != nil {
 		log.Print(err)
 	}
@@ -68,7 +67,7 @@ func (user *User) Validate() (map[string] interface{}, bool) {
 	}
 
 	if len(user.Password) < MinPasswordLength {
-		return u.Message(false, fmt.Sprintf("Password length must be longer then %d characters", MinLoginLength)), false
+		return u.Message(false, fmt.Sprintf("Password length must be longer then %d characters", MinPasswordLength)), false
 	}
 
 	err := checkmail.ValidateFormat(user.Email)
@@ -76,26 +75,27 @@ func (user *User) Validate() (map[string] interface{}, bool) {
 		return u.Message(false, "Email field empty or invalid"), false
 	}
 
-	res, err := repo.GetByLogin(user.Login)
-	if (User{}) != res {
+	tmp, err := user.GetByLogin(user.Login)
+	fmt.Println(tmp)
+	if user.Login == tmp.Login {
 		return u.Message(false, "User with the same login already exists"), false
 	}
 
-	res, err = repo.GetByEmail(user.Email)
-	if (User{}) != res {
+	tmp2, err := user.GetByEmail(user.Email)
+	if user.Email == tmp2.Email {
 		return u.Message(false, "User with the same email already exists"), false
 	}
 
 	return u.Message(true, "*ok*"), true
 }
 
-func Login(email, password string) map[string]interface{} {
-	user, err := repo.GetByEmail(email)
+func (user *User) Authenticate(email, password string) map[string]interface{} {
+	user, err := user.GetByEmail(email)
 	if err != nil {
 		return u.Message(false, "Unknown error")
 	}
 
-	if (User{}) == user {
+	if user == nil {
 		return u.Message(false, "User with this email does not exist")
 	}
 
@@ -113,5 +113,86 @@ func Login(email, password string) map[string]interface{} {
 	resp := u.Message(true, "Logged In")
 	resp["user"] = user
 	return resp
+}
+
+
+
+func (user *User) Save() (*User, error) {
+	err := db.Instance.Db.QueryRow(db.InsertQuery, user.Login, user.Email, user.Password, user.Token).Scan(&user.Id)
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return &User{}, fmt.Errorf(e.Error())
+	default:
+		return user, nil
+	}
+}
+
+func (user *User) ListAll() (users []User, err error) {
+	rows, err := db.Instance.Db.Query(db.ListAllQuery)
+	defer func() {
+		_ = rows.Close()
+	}()
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return users, fmt.Errorf(e.Error())
+	default:
+		for rows.Next() {
+			var u User
+			err = rows.Scan(&u.Id, &u.Login, &u.Email, &u.Password, &u.Token)
+			if err != nil {
+				return
+			}
+			users = append(users, u)
+		}
+	}
+
+	return
+}
+
+func (user *User) GetByID(id uint) (*User, error) {
+	row := db.Instance.Db.QueryRow(db.GetByIdQuery, id)
+	err := row.Scan(&user.Id, &user.Login, &user.Email, &user.Password, &user.Token)
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return &User{}, fmt.Errorf(e.Error())
+	default:
+		return user, nil
+	}
+}
+
+
+func (user *User) GetByEmail(email string) (*User, error) {
+	us := &User{}
+	row := db.Instance.Db.QueryRow(db.GetByEmailQuery, email)
+	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password, &us.Token)
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return &User{}, fmt.Errorf(e.Error())
+	default:
+		return us, nil
+	}
+}
+
+func (user *User) GetByLogin(login string) (*User, error) {
+	us := &User{}
+	row := db.Instance.Db.QueryRow(db.GetByLoginQuery, login)
+	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password, &us.Token)
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return &User{}, fmt.Errorf(e.Error())
+	default:
+		return us, nil
+	}
+}
+
+
+func (user *User) Delete(id uint) error {
+	_, err := db.Instance.Db.Exec(db.DeleteQuery, id)
+	return dberror.GetError(err)
 }
 

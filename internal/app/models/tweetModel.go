@@ -10,7 +10,7 @@ import (
 type Tweet struct {
 	Id uint `json:"id"`
 	Message string `json:"message"`
-	UserId string `json:"user_id"`
+	UserId uint `json:"user_id"`
 	CreatedAt int64 `json:"created_at"`
 }
 

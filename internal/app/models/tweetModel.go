@@ -5,6 +5,7 @@ import (
 	"github.com/Shyp/go-dberror"
 	"github.com/flatropw/gopher-twitter/internal/app/db"
 	u "github.com/flatropw/gopher-twitter/internal/app/utils"
+	"log"
 )
 
 type Tweet struct {
@@ -31,8 +32,27 @@ func (tweet *Tweet) Validate() (map[string] interface{}, bool) {
 	return u.Message(true, "*ok*"), true
 }
 
-func (tweet *Tweet) Create() (*Tweet, error) {
-	//tweet.CreatedAt = time.Now().Unix()
+func (tweet *Tweet) Create() map[string] interface{} {
+	if resp, ok := tweet.Validate(); !ok {
+		return resp
+	}
+
+	res, err := tweet.Save()
+	if err != nil {
+		log.Print(err)
+	}
+
+	if res.Id <= 0 {
+		return u.Message(false, "Failed to save tweet, connection error.")
+	}
+
+	response := u.Message(true, "Tweet has been saved")
+	response["tweet"] = tweet
+	return response
+
+}
+
+func (tweet *Tweet) Save() (*Tweet, error) {
 	err := db.Instance.Db.QueryRow(db.TweetInsertQuery, tweet.Message, tweet.UserId, tweet.CreatedAt).Scan(&tweet.Id)
 	dbErr := dberror.GetError(err)
 	switch e := dbErr.(type) {

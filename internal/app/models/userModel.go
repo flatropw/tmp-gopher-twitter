@@ -111,7 +111,7 @@ func (user *User) Authenticate(email, password string) map[string]interface{} {
 	user.Token, _ = token.SignedString([]byte(os.Getenv("token_password")))
 
 	resp := u.Message(true, "Logged In")
-	resp["user"] = user
+	resp["token"] = user.Token
 	return resp
 }
 

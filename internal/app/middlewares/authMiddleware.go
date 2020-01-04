@@ -13,7 +13,8 @@ import (
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if u.IsAuthorizedRoute(r.URL.Path) {
+		if u.IsPublicRoute(r.URL.Path) {
+			fmt.Println("next")
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -57,7 +58,6 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			return
 		}
 
-		fmt.Println("auth")
 		ctx := context.WithValue(r.Context(), "user", tk.Id)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)

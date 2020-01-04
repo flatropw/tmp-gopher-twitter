@@ -39,7 +39,6 @@ func (user *User) Create() map[string] interface{} {
 	user.Password = string(hashedPassword)
 
 	res, err := user.Save()
-	fmt.Println("res", res)
 	if err != nil {
 		log.Print(err)
 	}
@@ -50,7 +49,10 @@ func (user *User) Create() map[string] interface{} {
 
 	tk := &Token{Id: res.Id}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("token_secret")))
+	if err != nil {
+		log.Print(err)
+	}
 	user.Token = tokenString
 
 	user.Password = ""

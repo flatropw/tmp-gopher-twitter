@@ -13,6 +13,6 @@ const (
 //tweet queries
 
 const (
-	TweetInsertQuery = 	"INSERT INTO users (message, user_id, created_at) VALUES ($1, $2, $3) RETURNING id;"
+	TweetInsertQuery = 	"INSERT INTO tweets (message, user_id, created_at) VALUES ($1, $2, $3) RETURNING id;"
 
 )

@@ -2,6 +2,8 @@ package models
 
 import (
 	"fmt"
+	"github.com/Shyp/go-dberror"
+	"github.com/flatropw/gopher-twitter/internal/app/db"
 	u "github.com/flatropw/gopher-twitter/internal/app/utils"
 )
 
@@ -9,6 +11,7 @@ type Tweet struct {
 	Id uint `json:"id"`
 	Message string `json:"message"`
 	UserId string `json:"user_id"`
+	CreatedAt int64 `json:"created_at"`
 }
 
 const (
@@ -26,4 +29,16 @@ func (tweet *Tweet) Validate() (map[string] interface{}, bool) {
 	}
 
 	return u.Message(true, "*ok*"), true
+}
+
+func (tweet *Tweet) Create() (*Tweet, error) {
+	//tweet.CreatedAt = time.Now().Unix()
+	err := db.Instance.Db.QueryRow(db.TweetInsertQuery, tweet.Message, tweet.UserId, tweet.CreatedAt).Scan(&tweet.Id)
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return &Tweet{}, fmt.Errorf(e.Error())
+	default:
+		return tweet, nil
+	}
 }

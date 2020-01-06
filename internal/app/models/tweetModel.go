@@ -62,3 +62,35 @@ func (tweet *Tweet) Save() (*Tweet, error) {
 		return tweet, nil
 	}
 }
+
+func (tweet *Tweet) GetByUserId(userId uint, limit uint) (tweets []*Tweet, err error) {
+	rows, err := db.Instance.Db.Query("SELECT id, message, user_id, created_at FROM tweets WHERE user_id = $1 LIMIT $2", userId, limit)
+	defer rows.Close()
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return tweets, fmt.Errorf(e.Error())
+	default:
+	}
+
+	for rows.Next() {
+		tmp := Tweet{}
+		err = rows.Scan(&tmp.Id, &tmp.Message, &tmp.UserId, &tmp.CreatedAt)
+		dbErr := dberror.GetError(err)
+		switch e := dbErr.(type) {
+		case *dberror.Error:
+			return tweets, fmt.Errorf(e.Error())
+		default:
+			tweets = append(tweets, &tmp)
+		}
+	}
+
+	err = rows.Err()
+	dbErr = dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return tweets, fmt.Errorf(e.Error())
+	default:
+	}
+	return
+}

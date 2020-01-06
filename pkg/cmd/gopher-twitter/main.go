@@ -21,7 +21,6 @@ func main() {
 	}
 	err := db.Instance.Connect(connStr)
 	if err != nil {
-		panic(err)
 		log.Panic(err)
 	}
 

@@ -129,4 +129,3 @@ func (tweet *Tweet) GetByUserIds(subIds []uint, limit uint) (tweets []*Tweet, er
 	}
 	return
 }
-

@@ -12,10 +12,10 @@ type Subscriber struct {
 }
 
 type Subscription struct {
-	Id uint
+	Id           uint
 	SubscriberId uint
 	SubscribedId uint
-	Status bool
+	Status       bool
 }
 
 func (sub *Subscriber) SubscribeTo(Id uint) (subscription *Subscription, err error) {

@@ -14,4 +14,6 @@ func Init() {
 	Router.HandleFunc("/api/v1/users/register", controllers.RegisterUser).Methods("POST")
 	Router.HandleFunc("/api/v1/users/login", controllers.Authenticate).Methods("POST")
 	Router.HandleFunc("/api/v1/tweets", controllers.CreateTweet).Methods("POST")
+	Router.HandleFunc("/api/v1/tweets", controllers.ShowTweets).Methods("GET")
+	Router.HandleFunc("/api/v1/subscribers", controllers.Subscribe).Methods("POST")
 }

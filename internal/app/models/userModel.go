@@ -128,38 +128,17 @@ func (user *User) Save() (*User, error) {
 	}
 }
 
-func (user *User) ListAll() (users []User, err error) {
-	rows, err := db.Instance.Db.Query(db.ListAllQuery)
-	defer func() {
-		_ = rows.Close()
-	}()
-	dbErr := dberror.GetError(err)
-	switch e := dbErr.(type) {
-	case *dberror.Error:
-		return users, fmt.Errorf(e.Error())
-	default:
-		for rows.Next() {
-			var u User
-			err = rows.Scan(&u.Id, &u.Login, &u.Email, &u.Password, &u.Token)
-			if err != nil {
-				return
-			}
-			users = append(users, u)
-		}
-	}
-
-	return
-}
-
-func (user *User) GetByID(id uint) (*User, error) {
+func (user *User) GetById(id uint) (*User, error) {
+	us := &User{}
 	row := db.Instance.Db.QueryRow(db.GetByIdQuery, id)
-	err := row.Scan(&user.Id, &user.Login, &user.Email, &user.Password, &user.Token)
+	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password)
+	fmt.Println(err)
 	dbErr := dberror.GetError(err)
 	switch e := dbErr.(type) {
 	case *dberror.Error:
 		return &User{}, fmt.Errorf(e.Error())
 	default:
-		return user, nil
+		return us, nil
 	}
 }
 

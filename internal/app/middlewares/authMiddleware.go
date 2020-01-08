@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"context"
-	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/flatropw/gopher-twitter/internal/app/models"
 	u "github.com/flatropw/gopher-twitter/internal/app/utils"
@@ -14,7 +13,6 @@ import (
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if u.IsPublicRoute(r.URL.Path) {
-			fmt.Println("next")
 			next.ServeHTTP(w, r)
 			return
 		}

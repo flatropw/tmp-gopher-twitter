@@ -19,6 +19,7 @@ type Tweet struct {
 const (
 	MinTweetLength = 1
 	MaxTweetLength = 280
+	TweetsLimit = 100
 )
 
 func (tweet *Tweet) Validate() (map[string]interface{}, bool) {
@@ -62,7 +63,7 @@ func (tweet *Tweet) Save() (*Tweet, error) {
 	}
 }
 
-func (tweet *Tweet) GetByUserIds(subIds []uint, limit uint) (tweets []*Tweet, err error) {
+func (tweet *Tweet) GetByUserIds(subIds []uint, limit uint64) (tweets []*Tweet, err error) {
 	rows, err := db.Instance.Db.Query(db.TweetGetByUserIdsQuery, pq.Array(subIds), limit)
 	if err != nil {
 		return

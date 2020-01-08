@@ -6,6 +6,7 @@ import (
 	u "github.com/flatropw/gopher-twitter/internal/app/utils"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -20,7 +21,7 @@ var CreateTweet = func(w http.ResponseWriter, r *http.Request) {
 		u.Response(w, u.Message(false, "Invalid request"))
 		return
 	}
-	defer func(){
+	defer func() {
 		_ = r.Body.Close()
 	}()
 
@@ -57,8 +58,15 @@ var ShowTweets = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := models.Tweet{}
-	tweets, err := t.GetByUserIds(userIds, 30)
+
+	limit, err := strconv.ParseUint(r.URL.Query()["limit"][0], 10, 32)
+	if err != nil {
+		limit = models.TweetsLimit
+	}
+
+	tweets, err := t.GetByUserIds(userIds, limit)
 	response := u.Message(true, "Tweets from your subscription list")
 	response["tweets"] = tweets
+	response["limit"] = limit
 	u.Response(w, response)
 }

@@ -17,7 +17,7 @@ type Subscription struct {
 }
 
 func (sub *Subscriber) SubscribeTo(Id uint) (subscription *Subscription, err error) {
-	subscription, err = sub.HasAlreadySubscribed(Id)
+	subscription, err = sub.GetSubscriptionOf(Id)
 	if err != nil {
 		return
 	}
@@ -38,9 +38,9 @@ func (sub *Subscriber) SubscribeTo(Id uint) (subscription *Subscription, err err
 	}
 }
 
-func (sub *Subscriber) HasAlreadySubscribed(Id uint) (*Subscription, error) {
+func (sub *Subscriber) GetSubscriptionOf(subscribedId uint) (*Subscription, error) {
 	var subscription = Subscription{}
-	row := db.Instance.Db.QueryRow(db.SubHasAlreadySubscribedQuery, sub.user.Id, Id)
+	row := db.Instance.Db.QueryRow(db.SubHasAlreadySubscribedQuery, sub.user.Id, subscribedId)
 	err := row.Scan(&subscription.Id, &subscription.Status)
 	dbErr := dberror.GetError(err)
 	switch e := dbErr.(type) {

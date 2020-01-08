@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/Shyp/go-dberror"
 	"github.com/badoux/checkmail"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/flatropw/gopher-twitter/internal/app/db"
@@ -31,8 +30,8 @@ type User struct {
 }
 
 func (user *User) Create() map[string]interface{} {
-	if resp, ok := user.Validate(); !ok {
-		return resp
+	if response, ok := user.Validate(); !ok {
+		return response
 	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -77,13 +76,13 @@ func (user *User) Validate() (map[string]interface{}, bool) {
 		return u.Message(false, "Email field empty or invalid"), false
 	}
 
-	tmp, err := user.GetByLogin(user.Login)
-	if user.Login == tmp.Login {
+	us, err := user.GetByLogin(user.Login)
+	if user.Login == us.Login {
 		return u.Message(false, "User with the same login already exists"), false
 	}
 
-	tmp2, err := user.GetByEmail(user.Email)
-	if user.Email == tmp2.Email {
+	us, err = user.GetByEmail(user.Email)
+	if user.Email == us.Email {
 		return u.Message(false, "User with the same email already exists"), false
 	}
 
@@ -118,55 +117,31 @@ func (user *User) Authenticate(email, password string) map[string]interface{} {
 
 func (user *User) Save() (*User, error) {
 	err := db.Instance.Db.QueryRow(db.InsertQuery, user.Login, user.Email, user.Password, user.Token).Scan(&user.Id)
-	dbErr := dberror.GetError(err)
-	switch e := dbErr.(type) {
-	case *dberror.Error:
-		return &User{}, fmt.Errorf(e.Error())
-	default:
-		return user, nil
-	}
+	return user, err
 }
 
 func (user *User) GetById(id uint) (*User, error) {
 	us := &User{}
 	row := db.Instance.Db.QueryRow(db.GetByIdQuery, id)
 	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password)
-	dbErr := dberror.GetError(err)
-	switch e := dbErr.(type) {
-	case *dberror.Error:
-		return &User{}, fmt.Errorf(e.Error())
-	default:
-		return us, nil
-	}
+	return us, err
 }
 
 func (user *User) GetByEmail(email string) (*User, error) {
 	us := &User{}
 	row := db.Instance.Db.QueryRow(db.GetByEmailQuery, email)
 	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password, &us.Token)
-	dbErr := dberror.GetError(err)
-	switch e := dbErr.(type) {
-	case *dberror.Error:
-		return &User{}, fmt.Errorf(e.Error())
-	default:
-		return us, nil
-	}
+	return us, err
 }
 
 func (user *User) GetByLogin(login string) (*User, error) {
 	us := &User{}
 	row := db.Instance.Db.QueryRow(db.GetByLoginQuery, login)
 	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password, &us.Token)
-	dbErr := dberror.GetError(err)
-	switch e := dbErr.(type) {
-	case *dberror.Error:
-		return &User{}, fmt.Errorf(e.Error())
-	default:
-		return us, nil
-	}
+	return us, err
 }
 
 func (user *User) Delete(id uint) error {
 	_, err := db.Instance.Db.Exec(db.DeleteQuery, id)
-	return dberror.GetError(err)
+	return err
 }

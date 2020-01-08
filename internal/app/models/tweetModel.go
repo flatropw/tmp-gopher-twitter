@@ -5,6 +5,7 @@ import (
 	"github.com/Shyp/go-dberror"
 	"github.com/flatropw/gopher-twitter/internal/app/db"
 	u "github.com/flatropw/gopher-twitter/internal/app/utils"
+	"github.com/lib/pq"
 	"log"
 )
 
@@ -49,7 +50,6 @@ func (tweet *Tweet) Create() map[string]interface{} {
 	response := u.Message(true, "Tweet has been saved")
 	response["tweet"] = tweet
 	return response
-
 }
 
 func (tweet *Tweet) Save() (*Tweet, error) {
@@ -94,3 +94,39 @@ func (tweet *Tweet) GetByUserId(userId uint, limit uint) (tweets []*Tweet, err e
 	}
 	return
 }
+
+func (tweet *Tweet) GetByUserIds(subIds []uint, limit uint) (tweets []*Tweet, err error) {
+	rows, err := db.Instance.Db.Query(db.TweetGetByUserIdsQuery, pq.Array(subIds), limit)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer rows.Close()
+	dbErr := dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return tweets, fmt.Errorf(e.Error())
+	default:
+	}
+
+	for rows.Next() {
+		tmp := Tweet{}
+		err = rows.Scan(&tmp.Id, &tmp.Message, &tmp.UserId, &tmp.CreatedAt)
+		dbErr := dberror.GetError(err)
+		switch e := dbErr.(type) {
+		case *dberror.Error:
+			return tweets, fmt.Errorf(e.Error())
+		default:
+			tweets = append(tweets, &tmp)
+		}
+	}
+
+	err = rows.Err()
+	dbErr = dberror.GetError(err)
+	switch e := dbErr.(type) {
+	case *dberror.Error:
+		return tweets, fmt.Errorf(e.Error())
+	default:
+	}
+	return
+}
+

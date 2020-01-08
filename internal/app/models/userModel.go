@@ -78,7 +78,6 @@ func (user *User) Validate() (map[string]interface{}, bool) {
 	}
 
 	tmp, err := user.GetByLogin(user.Login)
-	fmt.Println(tmp)
 	if user.Login == tmp.Login {
 		return u.Message(false, "User with the same login already exists"), false
 	}
@@ -132,7 +131,6 @@ func (user *User) GetById(id uint) (*User, error) {
 	us := &User{}
 	row := db.Instance.Db.QueryRow(db.GetByIdQuery, id)
 	err := row.Scan(&us.Id, &us.Login, &us.Email, &us.Password)
-	fmt.Println(err)
 	dbErr := dberror.GetError(err)
 	switch e := dbErr.(type) {
 	case *dberror.Error:

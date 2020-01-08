@@ -16,10 +16,10 @@ type Subscription struct {
 	Status       bool `json:"status"`
 }
 
-func (sub *Subscriber) SubscribeTo(Id uint) (subscription *Subscription, err error) {
-	subscription, err = sub.GetSubscriptionOn(Id)
+func (sub *Subscriber) SubscribeTo(Id uint) (*Subscription, error) {
+	subscription, err := sub.GetSubscriptionOn(Id)
 	if err != nil {
-		return
+		return &Subscription{}, nil
 	}
 
 	if subscription.Id > 0 {
@@ -31,7 +31,7 @@ func (sub *Subscriber) SubscribeTo(Id uint) (subscription *Subscription, err err
 		err = row.Scan(&subscription.Id, &subscription.SubscriberId, &subscription.SubscribedId, &subscription.Status)
 	}
 
-	return
+	return subscription, err
 }
 
 func (sub *Subscriber) GetSubscriptionOn(subscribedId uint) (*Subscription, error) {

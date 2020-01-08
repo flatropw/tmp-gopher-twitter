@@ -12,11 +12,13 @@ var RegisterUser = func(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 
 	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
 	if err != nil {
 		u.Response(w, u.Message(false, "Invalid request"))
 		return
 	}
+	defer func(){
+		_ = r.Body.Close()
+	}()
 
 	err = json.Unmarshal(body, &user)
 	if err != nil {
@@ -34,6 +36,9 @@ var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		u.Response(w, u.Message(false, "Invalid request"))
 	}
+	defer func(){
+		_ = r.Body.Close()
+	}()
 
 	err = json.Unmarshal(body, &user)
 	if err != nil {

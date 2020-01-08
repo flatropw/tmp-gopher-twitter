@@ -67,7 +67,9 @@ func (tweet *Tweet) GetByUserIds(subIds []uint, limit uint) (tweets []*Tweet, er
 	if err != nil {
 		return
 	}
-	defer rows.Close()
+	defer func(){
+		_ = rows.Close()
+	}()
 	dbErr := dberror.GetError(err)
 	switch e := dbErr.(type) {
 	case *dberror.Error:

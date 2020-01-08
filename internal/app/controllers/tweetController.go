@@ -16,11 +16,13 @@ var CreateTweet = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
 	if err != nil {
 		u.Response(w, u.Message(false, "Invalid request"))
 		return
 	}
+	defer func(){
+		_ = r.Body.Close()
+	}()
 
 	err = json.Unmarshal(body, &tweet)
 	if err != nil {

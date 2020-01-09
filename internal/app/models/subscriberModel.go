@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"github.com/flatropw/gopher-twitter/internal/app/db"
 	"time"
 )
@@ -22,10 +23,13 @@ func (sub *Subscriber) SubscribeTo(Id uint) (*Subscription, error) {
 		return &Subscription{}, nil
 	}
 
+	if sub.User.Id == Id {
+		return &Subscription{}, errors.New("you cannot subscribe to yourself")
+	}
+
 	if subscription.Id > 0 {
 		row := db.Instance.Db.QueryRow(db.SubUpdateStatusQuery, !subscription.Status, time.Now().Unix(), subscription.Id)
 		err = row.Scan(&subscription.Status)
-
 	} else {
 		row := db.Instance.Db.QueryRow(db.SubInsertQuery, sub.User.Id, Id, time.Now().Unix(), time.Now().Unix())
 		err = row.Scan(&subscription.Id, &subscription.SubscriberId, &subscription.SubscribedId, &subscription.Status)

@@ -1,0 +1,471 @@
+{
+	"info": {
+		"_postman_id": "0",
+		"name": "Twitter-like-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login endpoint",
+			"request": {
+				"method": "POST",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"a6@test.com\",\n\t\"password\": \"tests\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "Authorization",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6MTR9.D0lVx-P7DdDK49eUK8Bvyr_nuXQcc6RpQac_ayeOkds",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Login endpoint",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "YOUR_BEARER_HERE",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"a6@test.com\",\n\t\"password\": \"tests\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							],
+							"query": [
+								{
+									"key": "Authorization",
+									"value": "NEW_BEARER",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application-json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 08 Jan 2020 13:47:47 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "141"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Logged In\",\n    \"status\": true,\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6MTZ9.s_hkdTsTnfR3MLJf3-Jm3O5-Olq1Qfxie-M7cydcB4g\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Register endpoint",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "test",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"saaaaaa6\",\n  \"email\": \"a6@test.com\",\n  \"password\": \"tests\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add tweet endpoint",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "YOUR_BEARER_HERE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"message\": \"Hello my first tweet\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/tweets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"tweets"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Add tweet endpoint",
+					"originalRequest": {
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"message\": \"Hello my first tweet\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/tweets",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"tweets"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application-json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 08 Jan 2020 14:45:01 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "136"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Tweet has been saved\",\n    \"status\": true,\n    \"tweet\": {\n        \"id\": 14,\n        \"message\": \"Hello my first tweet\",\n        \"user_id\": 15,\n        \"created_at\": 1578494701\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Index endpoint",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Subscribe endpoint",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "YOUR_BEARER_HERE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"nickname\": \"saaaaaa5\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/subscribers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"subscribers"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Subscribe endpoint",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nickname\": \"saaaaaa5\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/subscribers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"subscribers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application-json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 08 Jan 2020 12:45:34 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "135"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"You have successfully subscribed\",\n    \"status\": true,\n    \"subscription\": {\n        \"Id\": 12,\n        \"SubscriberId\": 16,\n        \"SubscribedId\": 15,\n        \"Status\": true\n    }\n}"
+				},
+				{
+					"name": "Subscribe endpoint",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nickname\": \"saaaaaa5\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/subscribers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"subscribers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application-json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 08 Jan 2020 12:45:34 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "135"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"You have successfully subscribed\",\n    \"status\": true,\n    \"subscription\": {\n        \"Id\": 12,\n        \"SubscriberId\": 16,\n        \"SubscribedId\": 15,\n        \"Status\": true\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Tweets list endpoint",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "YOUR_BEARER_HERE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/tweets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"tweets"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Tweets list endpoint",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/tweets?limit=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"tweets"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application-json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 08 Jan 2020 14:12:41 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "243"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"limit\": 2,\n    \"message\": \"Tweets from your subscription list\",\n    \"status\": true,\n    \"tweets\": [\n        {\n            \"id\": 13,\n            \"message\": \"Hello my first tweet\",\n            \"user_id\": 15,\n            \"created_at\": 1578236019\n        },\n        {\n            \"id\": 12,\n            \"message\": \"Hello my first tweet\",\n            \"user_id\": 15,\n            \"created_at\": 1578156831\n        }\n    ]\n}"
+				},
+				{
+					"name": "Tweets list endpoint",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/tweets?limit=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"tweets"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application-json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 08 Jan 2020 14:12:41 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "243"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"limit\": 2,\n    \"message\": \"Tweets from your subscription list\",\n    \"status\": true,\n    \"tweets\": [\n        {\n            \"id\": 13,\n            \"message\": \"Hello my first tweet\",\n            \"user_id\": 15,\n            \"created_at\": 1578236019\n        },\n        {\n            \"id\": 12,\n            \"message\": \"Hello my first tweet\",\n            \"user_id\": 15,\n            \"created_at\": 1578156831\n        }\n    ]\n}"
+				}
+			]
+		}
+	],
+	"protocolProfileBehavior": {}
+}
